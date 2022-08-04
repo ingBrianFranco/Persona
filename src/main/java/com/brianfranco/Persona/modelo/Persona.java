@@ -2,11 +2,7 @@ package com.brianfranco.Persona.modelo;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -14,6 +10,7 @@ import javax.persistence.Table;
 @Table
 public class Persona {
     @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "id_persona")
     int idPersona;
     @Column
