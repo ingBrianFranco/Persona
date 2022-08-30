@@ -26,6 +26,9 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	//testImplementation group: 'org.mockito', name: 'mockito-inline', version: '2.7.21'
+	//testImplementation group: 'org.mockito', name: 'mockito-core', version: '2.23.4'
+	testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
 }
 
 tasks.named('test') {
