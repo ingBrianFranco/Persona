@@ -17,7 +17,7 @@ public class Endpoint {
     Service service;
 
     @GetMapping("/{idPersona}")
-    public Object buscarPersonaPorId(@PathVariable int idPersona){
+    public ResponseEntity<Persona> buscarPersonaPorId(@PathVariable int idPersona){
         Persona persona = service.buscarPersonaPorId(idPersona);
         if(persona == null){
             return new ResponseEntity<Persona>(HttpStatus.NOT_FOUND);
@@ -26,7 +26,7 @@ public class Endpoint {
     }
 
     @PostMapping("/guardar")
-    public Object guardarPersona(@RequestBody Persona persona){
+    public ResponseEntity<Persona> guardarPersona(@RequestBody Persona persona){
         //Llamar a nuestro modelo para que ejecute la lógica de negocio
         //Retornar la respuesta que nos entrega la lógica de negocio
         return new ResponseEntity<Persona>(
@@ -35,7 +35,7 @@ public class Endpoint {
     }
 
     @GetMapping("/todas")
-    public Object listarTodas(){
+    public ResponseEntity<Persona> listarTodas(){
         return new ResponseEntity(service.buscarTodasLasPersonas(), HttpStatus.FOUND);
     }
 
