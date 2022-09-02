@@ -7,10 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Spliterator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @org.springframework.stereotype.Service
 @AllArgsConstructor
@@ -28,12 +24,20 @@ public class Service {
         }
     }
 
-    public Persona guardarPersona(Persona persona){
+    public Persona guardarPersona(Persona persona) throws Exception{
         //Comprobar que la persona no exista en el sistema
         //Guardar la persona
         //Responder si la persona ha sido o no guardada
-        Persona personaNuevo = personaRepositorio.save(persona);
-        return persona;
+        //try {
+            Persona personaNuevo = personaRepositorio.save(persona);
+            return personaNuevo;
+        /*}catch (Exception e){
+            return null;
+        }*/
+    }
+
+    public void eliminarPersonaPorId(int idPersona){
+        personaRepositorio.deleteById(idPersona);
     }
 
     public List<Persona> buscarTodasLasPersonas() {

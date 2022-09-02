@@ -26,7 +26,7 @@ public class Endpoint {
     }
 
     @PostMapping("/guardar")
-    public ResponseEntity<Persona> guardarPersona(@RequestBody Persona persona){
+    public ResponseEntity<Persona> guardarPersona(@RequestBody Persona persona) throws Exception {
         //Llamar a nuestro modelo para que ejecute la lógica de negocio
         //Retornar la respuesta que nos entrega la lógica de negocio
         return new ResponseEntity<Persona>(
