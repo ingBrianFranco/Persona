@@ -1,27 +1,19 @@
 package com.brianfranco.Persona.controller;
 
+import com.brianfranco.Persona.data.FactoryPersonaTestData;
 import com.brianfranco.Persona.modelo.Persona;
 import com.brianfranco.Persona.modelo.Service;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultHandler;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -56,17 +48,11 @@ class EndpointTest {
     @Test
     void buscarPersonaPorId() throws Exception {
         //Given
-        Persona persona = new Persona();
-        persona.setIdPersona(1);
-        persona.setNombre("Brian");
-        persona.setDireccion("Avenida siempre viva 124");
-        persona.setTipoDocumento(1);
-        persona.setDocumento(10971234);
-        persona.setTelefono("3117894561");
 
         //When
-        when(service.buscarPersonaPorId(anyInt())).thenReturn(persona);
+        when(service.buscarPersonaPorId(anyInt())).thenReturn(FactoryPersonaTestData.getPersona());
 
+        //Then
         mvc
                 .perform(
                         MockMvcRequestBuilders
@@ -90,10 +76,9 @@ class EndpointTest {
     @Test
     void whenPersonaNullbuscarPersonaPorId() throws Exception {
         //Given
-        Persona persona = null;
 
         //When
-        when(service.buscarPersonaPorId(anyInt())).thenReturn(persona);
+        when(service.buscarPersonaPorId(anyInt())).thenReturn(FactoryPersonaTestData.getPesonaNull());
 
         //Then
         mvc
@@ -104,7 +89,7 @@ class EndpointTest {
                 )
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist())
-                .andDo(MockMvcResultHandlers.print())
+                //.andDo(MockMvcResultHandlers.print())
         ;
     }
 
@@ -120,32 +105,26 @@ class EndpointTest {
     @Test
     void guardarPersona() throws Exception {
         //Given
-        Persona persona = new Persona();
-        persona.setIdPersona(1);
-        persona.setNombre("Brian");
-        persona.setDireccion("Avenida siempre viva 124");
-        persona.setTipoDocumento(1);
-        persona.setDocumento(10971234);
-        persona.setTelefono("3112589324");
+        var expectedResponse = FactoryPersonaTestData.getPersona();
 
         //When
-        when(service.guardarPersona(any(Persona.class))).thenReturn(persona);
+        when(service.guardarPersona(any(Persona.class))).thenReturn(expectedResponse);
 
+        //Then
         mvc
                 .perform(
                         MockMvcRequestBuilders
                                 .post("/persona/guardar")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content("{\"nombre\": \"Brian\", \"tipoDocumento\": 1, \"documento\": 10971284, \"direccion\": \"Avenida siempre viva 124\", \"telefono\": \"3112589324\"}")
+                                .content(FactoryPersonaTestData.getJSONPersona())
                 )
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.idPersona", Matchers.is(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nombre", Matchers.is("Brian")))
-                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.idPersona", Matchers.is(expectedResponse.getIdPersona())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nombre", Matchers.is(expectedResponse.getNombre())))
+                //.andDo(MockMvcResultHandlers.print())
         ;
 
         verify(service).guardarPersona(any(Persona.class));
-
     }
 
     /*@Test
@@ -160,14 +139,9 @@ class EndpointTest {
     @Test
     void listarTodas() throws Exception {
         //Given
-        Persona persona = new Persona();
-        persona.setIdPersona(1);
-        persona.setNombre("Brian");
-        List<Persona> personaList = new ArrayList<Persona>();
-        personaList.add(persona);
 
         //When
-        when(service.buscarTodasLasPersonas()).thenReturn(personaList);
+        when(service.buscarTodasLasPersonas()).thenReturn(FactoryPersonaTestData.getPersonaList());
 
         //Then
         mvc
