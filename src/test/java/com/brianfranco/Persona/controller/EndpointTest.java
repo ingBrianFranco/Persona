@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -46,11 +48,12 @@ class EndpointTest {
     }*/
 
     @Test
-    void buscarPersonaPorId() throws Exception {
+    void seDebeDevolverUnaPersonaComoMensajeJSON() throws Exception {
         //Given
+        Persona expectedPersona = FactoryPersonaTestData.getPersona();
 
         //When
-        when(service.buscarPersonaPorId(anyInt())).thenReturn(FactoryPersonaTestData.getPersona());
+        when(service.buscarPersonaPorId(anyInt())).thenReturn(expectedPersona);
 
         //Then
         mvc
@@ -59,9 +62,27 @@ class EndpointTest {
                                 .get("/persona/1")
                                 //.param("idPersona", "1")
                 )
+                .andExpect(MockMvcResultMatchers.jsonPath("$.idPersona", Matchers.is(expectedPersona.getIdPersona())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nombre", Matchers.is(expectedPersona.getNombre())))
+        ;
+    }
+
+    @Test
+    void seDebeDevolverStatusFound() throws Exception {
+        //Given
+        Persona expectedPersona = FactoryPersonaTestData.getPersona();
+
+        //When
+        when(service.buscarPersonaPorId(anyInt())).thenReturn(expectedPersona);
+
+        //Then
+        mvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/persona/1")
+                        //.param("idPersona", "1")
+                )
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.idPersona", Matchers.is(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nombre", Matchers.is("Brian")))
         ;
     }
 
@@ -74,11 +95,31 @@ class EndpointTest {
     }*/
 
     @Test
-    void whenPersonaNullbuscarPersonaPorId() throws Exception {
+    void seDebeDevolverUnJSONVacioAlNoEncontrarPersonaPorId() throws Exception {
         //Given
+        Persona expectedPersona = null;
 
         //When
-        when(service.buscarPersonaPorId(anyInt())).thenReturn(FactoryPersonaTestData.getPesonaNull());
+        when(service.buscarPersonaPorId(anyInt())).thenReturn(expectedPersona);
+
+        //Then
+        mvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .get("/persona/3")
+                        //.param("idPersona", "1")
+                )
+                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist())
+        ;
+    }
+
+    @Test
+    void seDebeDevolverUnStatusNotFoundAlNoEncontrarPersonaPorId() throws Exception {
+        //Given
+        Persona expectedPersona = null;
+
+        //When
+        when(service.buscarPersonaPorId(anyInt())).thenReturn(expectedPersona);
 
         //Then
         mvc
@@ -88,8 +129,6 @@ class EndpointTest {
                         //.param("idPersona", "1")
                 )
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$").doesNotExist())
-                //.andDo(MockMvcResultHandlers.print())
         ;
     }
 
@@ -103,7 +142,28 @@ class EndpointTest {
     }*/
 
     @Test
-    void guardarPersona() throws Exception {
+    void seDebeGuardarUnaPersona() throws Exception {
+        //Given
+        var expectedResponse = FactoryPersonaTestData.getPersona();
+
+        //When
+        when(service.guardarPersona(any(Persona.class))).thenReturn(expectedResponse);
+
+        mvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/persona/guardar")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(FactoryPersonaTestData.getJSONPersona())
+                )
+        ;
+
+        //Then
+        verify(service).guardarPersona(any(Persona.class));
+    }
+
+    @Test
+    void seDebeDevolverLaPersonaGuardadaAlGuardarUnaPersona() throws Exception {
         //Given
         var expectedResponse = FactoryPersonaTestData.getPersona();
 
@@ -121,10 +181,27 @@ class EndpointTest {
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.idPersona", Matchers.is(expectedResponse.getIdPersona())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.nombre", Matchers.is(expectedResponse.getNombre())))
-                //.andDo(MockMvcResultHandlers.print())
         ;
+    }
 
-        verify(service).guardarPersona(any(Persona.class));
+    @Test
+    void seDebeDevolverStatusCreatedAlGuardarUnaPersona() throws Exception {
+        //Given
+        var expectedResponse = FactoryPersonaTestData.getPersona();
+
+        //When
+        when(service.guardarPersona(any(Persona.class))).thenReturn(expectedResponse);
+
+        //Then
+        mvc
+                .perform(
+                        MockMvcRequestBuilders
+                                .post("/persona/guardar")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(FactoryPersonaTestData.getJSONPersona())
+                )
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+        ;
     }
 
     /*@Test
@@ -137,11 +214,30 @@ class EndpointTest {
     }*/
 
     @Test
-    void listarTodas() throws Exception {
+    void seDebeDevolverUnaListaDePersonasEncontradas() throws Exception {
         //Given
+        List<Persona> personaList = FactoryPersonaTestData.getPersonaList();
 
         //When
-        when(service.buscarTodasLasPersonas()).thenReturn(FactoryPersonaTestData.getPersonaList());
+        when(service.buscarTodasLasPersonas()).thenReturn(personaList);
+
+        //Then
+        mvc
+                .perform(MockMvcRequestBuilders
+                        .get("/persona/todas/")
+                        .header("ClientSecret", "asdf1234")
+                )
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(1)))
+        ;
+    }
+
+    @Test
+    void seDebeDevolverStatusFoundListaDePersonas() throws Exception {
+        //Given
+        List<Persona> personaList = FactoryPersonaTestData.getPersonaList();
+
+        //When
+        when(service.buscarTodasLasPersonas()).thenReturn(personaList);
 
         //Then
         mvc
@@ -150,8 +246,26 @@ class EndpointTest {
                         .header("ClientSecret", "asdf1234")
                 )
                 .andExpect(MockMvcResultMatchers.status().isFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", Matchers.is(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].idPersona", Matchers.is(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].nombre", Matchers.is("Brian")));
+        ;
+    }
+
+    @Test
+    void seDebeDevolverPersonasEncontradasEnSistema() throws Exception {
+        //Given
+        List<Persona> personaList = FactoryPersonaTestData.getPersonaList();
+        Persona expectedPersona = FactoryPersonaTestData.getPersona();
+
+        //When
+        when(service.buscarTodasLasPersonas()).thenReturn(personaList);
+
+        //Then
+        mvc
+                .perform(MockMvcRequestBuilders
+                        .get("/persona/todas/")
+                        .header("ClientSecret", "asdf1234")
+                )
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].idPersona", Matchers.is(expectedPersona.getIdPersona())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].nombre", Matchers.is(expectedPersona.getNombre())))
+        ;
     }
 }
